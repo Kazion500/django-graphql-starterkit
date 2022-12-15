@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  graphql-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: python-api
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
+
+    ports:
+      - 8000:8000
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:14.2
+    container_name: graphql-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+
+volumes:
+  postgres:
+
+networks:
+  backend:
